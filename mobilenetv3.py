@@ -45,9 +45,9 @@ class SEModule(nn.Module):
         super(SEModule, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Sequential(
-            nn.Linear(channel, channel // reduction, bias=False),
+            nn.Linear(channel, channel // reduction),
             nn.ReLU(inplace=True),
-            nn.Linear(channel // reduction, channel, bias=False),
+            nn.Linear(channel // reduction, channel),
             Hsigmoid()
             # nn.Sigmoid()
         )
@@ -222,12 +222,8 @@ class MobileNetV3(nn.Module):
                     nn.init.zeros_(m.bias)
 
 
-def mobilenetv3(pretrained=False, **kwargs):
-    model = MobileNetV3(**kwargs)
-    if pretrained:
-        state_dict = torch.load('mobilenetv3_small_67.4.pth.tar')
-        model.load_state_dict(state_dict, strict=True)
-        # raise NotImplementedError
+def mobilenetv3():
+    model = MobileNetV3(n_class=1000, input_size=224, mode='large', width_mult=1.0)
     return model
 
 
@@ -242,6 +238,3 @@ if __name__ == '__main__':
     print('Total params: %.2fM' % (params/1000000.0))
     print('Total flops: %.2fM' % (flops/1000000.0))
     out = net(inputs)
-
-
-
